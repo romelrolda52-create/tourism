@@ -1,4 +1,5 @@
 <x-guest-layout>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <div class="min-h-screen flex flex-col md:flex-row">
         <!-- Left side with background/design -->
         <div class="hidden md:flex md:w-1/2 bg-gradient-to-br from-purple-600 to-indigo-900 p-8 flex-col justify-between relative overflow-hidden">
@@ -136,10 +137,7 @@
                                     <option value="user" {{ old('role', 'user') === 'user' ? 'selected' : '' }}>Regular User</option>
                                     <!-- Add more options if needed -->
                                 </select>
-                                  <select name="role" id="role" class="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-200 appearance-none bg-white" required>
-                                    <option value="admin" {{ old('role', 'admin') === 'admin' ? 'selected' : '' }}>Admin</option>
-                                    <!-- Add more options if needed -->
-                                </select>
+                                 
                                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                     <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
