@@ -395,7 +395,7 @@
                             required autofocus autocomplete="username"
                             placeholder="you@example.com">
                     </div>
-                    @error('email')<div class="ferr">{ $message }</div>@enderror
+                    @error('email')<div class="ferr">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="fd">
@@ -414,7 +414,7 @@
                             <i class="fas fa-eye"></i>
                         </button>
                     </div>
-                    @error('password')<div class="ferr">{ $message }</div>@enderror
+                    @error('password')<div class="ferr">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="rem">
@@ -443,23 +443,27 @@
             <form method="POST" action="{{ route('register') }}">
                 @csrf
 
-                <div class="fr2">
-                    <div>
-                        <label class="fl">First Name</label>
-                        <div class="fw">
-                            <i class="fas fa-user fi"></i>
-                            <input type="text" name="first_name" class="fin"
-                                placeholder="Juan" value="{{ old('first_name') }}" required>
-                        </div>
+                <div class="fd">
+                    <label class="fl">Full Name</label>
+                    <div class="fw">
+                        <i class="fas fa-user fi"></i>
+                        <input type="text" name="name" class="fin"
+                            placeholder="Juan dela Cruz" value="{{ old('name') }}" required>
                     </div>
-                    <div>
-                        <label class="fl">Last Name</label>
-                        <div class="fw">
-                            <i class="fas fa-user fi"></i>
-                            <input type="text" name="last_name" class="fin"
-                                placeholder="dela Cruz" value="{{ old('last_name') }}" required>
-                        </div>
+                    @error('name')<div class="ferr">{{ $message }}</div>@enderror
+                </div>
+
+                <div class="fd">
+                    <label class="fl">Account Type</label>
+                    <div class="fw">
+                        <i class="fas fa-user-tag fi"></i>
+                        <select name="role" class="fin" required style="padding-left: 40px;">
+                            <option value="user" selected>Regular User</option>
+                            <option value="manager">Hotel Manager</option>
+                            <option value="admin">Administrator</option>
+                        </select>
                     </div>
+                    @error('role')<div class="ferr">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="fd">
@@ -469,7 +473,7 @@
                         <input type="email" name="email" class="fin"
                             placeholder="you@example.com" required value="{{ old('email') }}">
                     </div>
-                    @error('email')<div class="ferr">{ $message }</div>@enderror
+                    @error('email')<div class="ferr">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="fd">
@@ -489,7 +493,7 @@
                         <div class="pwb-i" id="b3"></div>
                     </div>
                     <div class="pwb-l" id="bl"></div>
-                    @error('password')<div class="ferr">{ $message }</div>@enderror
+                    @error('password')<div class="ferr">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="fd">
