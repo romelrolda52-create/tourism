@@ -16,7 +16,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard — Wandr</title>
+<title>Dashboard — USER</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -484,7 +484,7 @@ body::after{
     <div class="sb-logo-icon">
       <svg width="18" height="18" fill="none" stroke="white" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
     </div>
-    <span class="serif" style="font-size:1.25rem;color:var(--text);letter-spacing:-.01em;">Wandr</span>
+    <span class="serif" style="font-size:1.25rem;color:var(--text);letter-spacing:-.01em;">USER</span>
   </div>
 
   <!-- Nav -->
@@ -954,7 +954,7 @@ body::after{
     <!-- Footer -->
     <div style="padding-top:8px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
       <p style="font-size:.7rem;color:var(--dim);">Signed in as <span style="color:var(--accent);font-weight:600;">{{ Auth::user()->email }}</span></p>
-      <p class="serif" style="font-size:.7rem;color:var(--dim);">Wandr &copy; {{ date('Y') }}</p>
+      <p class="serif" style="font-size:.7rem;color:var(--dim);">USER &copy; {{ date('Y') }}</p>
     </div>
 
   </div><!-- /content -->
