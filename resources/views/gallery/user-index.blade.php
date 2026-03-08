@@ -1,406 +1,385 @@
 @php
     use App\Models\Gallery;
 @endphp
-
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gallery | Tourism Portal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                        }
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.3s ease-in-out',
-                        'slide-in': 'slideIn 0.3s ease-out',
-                        'bounce-in': 'bounceIn 0.5s ease-out',
-                    },
-                    keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
-                        },
-                        slideIn: {
-                            '0%': { transform: 'translateY(-10px)', opacity: '0' },
-                            '100%': { transform: 'translateY(0)', opacity: '1' },
-                        },
-                        bounceIn: {
-                            '0%': { transform: 'scale(0.9)', opacity: '0' },
-                            '70%': { transform: 'scale(1.05)' },
-                            '100%': { transform: 'scale(1)', opacity: '1' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        * {
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-        
-        .sidebar-item.active {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
-        }
-        
-        .card-hover {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
-        }
-        
-        /* Image loading states */
-        .image-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%);
-            background-size: 200% 200%;
-            animation: gradient-shift 3s ease infinite;
-        }
-        
-        @keyframes gradient-shift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-        
-        .image-container img {
-            opacity: 0;
-            transition: opacity 0.4s ease-in-out;
-        }
-        
-        .image-container img.loaded {
-            opacity: 1;
-        }
-        
-        .image-placeholder {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 25%, #bae6fd 50%, #7dd3fc 75%, #0ea5e9 100%);
-            background-size: 400% 400%;
-            animation: gradient-shift 8s ease infinite;
-        }
-        
-        .image-error {
-            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 50%, #fca5a5 100%);
-        }
-        
-        .scrollbar-thin::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .scrollbar-thin::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        
-        .scrollbar-thin::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gallery — Wandr</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g1:#0A1F11;--g2:#0F2D18;--g3:#163D22;
+  --accent:#22C55E;--accent2:#16A34A;--accent3:#4ADE80;
+  --card:#122119;--card2:#172C1F;
+  --border:rgba(34,197,94,.13);--border2:rgba(34,197,94,.22);
+  --text:#E8F5EC;--muted:#6EAF82;--dim:#3D6B4F;
+  --danger:#F87171;--amber:#FCD34D;--sky:#67E8F9;
+  --sidebar-w:260px;--topbar-h:64px;
+}
+.light{
+  --g1:#F0F9F3;--g2:#FFFFFF;--g3:#E8F5EC;
+  --card:#FFFFFF;--card2:#F5FBF7;
+  --border:rgba(46,125,82,.14);--border2:rgba(46,125,82,.28);
+  --text:#0D1F14;--muted:#4A7A5C;--dim:#9EC4AC;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--g1);color:var(--text);display:flex;}
+.serif{font-family:'Instrument Serif',serif;}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:999;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:160px;}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--dim);border-radius:9px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes gradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes lbIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+.fu{animation:fadeUp .6s cubic-bezier(.22,1,.36,1) both}
+.fu1{animation-delay:.04s}.fu2{animation-delay:.1s}.fu3{animation-delay:.16s}
+.fu4{animation-delay:.22s}.fu5{animation-delay:.28s}
 
-        /* Lightbox */
-        .lightbox {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
-        }
-        
-        .lightbox.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .lightbox img {
-            max-width: 90%;
-            max-height: 90vh;
-            border-radius: 8px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        }
-    </style>
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);height:100vh;background:var(--g2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;position:relative;z-index:20;}
+.sidebar::before{content:'';position:absolute;top:0;right:0;width:1px;height:100%;background:linear-gradient(to bottom,transparent,var(--accent2),transparent);opacity:.4;}
+.sb-logo{padding:0 20px;height:var(--topbar-h);display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);}
+.sb-logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent2),var(--accent3));display:flex;align-items:center;justify-content:center;box-shadow:0 0 16px rgba(34,197,94,.3);flex-shrink:0;}
+.sb-nav{flex:1;padding:16px 12px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+.sb-section-label{font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);padding:12px 10px 6px;}
+.sb-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;font-size:.82rem;font-weight:500;color:var(--muted);text-decoration:none;cursor:pointer;transition:all .2s;position:relative;border:1px solid transparent;}
+.sb-item:hover{color:var(--text);background:rgba(34,197,94,.07);}
+.sb-item.active{color:var(--accent3);background:rgba(34,197,94,.1);border-color:var(--border2);font-weight:600;}
+.sb-item.active::before{content:'';position:absolute;left:0;top:25%;bottom:25%;width:3px;border-radius:0 3px 3px 0;background:var(--accent);}
+.sb-item svg{flex-shrink:0;opacity:.7}.sb-item.active svg{opacity:1}
+.sb-badge{margin-left:auto;background:rgba(34,197,94,.15);color:var(--accent3);font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:99px;border:1px solid rgba(34,197,94,.2);}
+.sb-footer{padding:16px;border-top:1px solid var(--border);}
+.sb-user{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:rgba(34,197,94,.06);border:1px solid var(--border);}
+.sb-avatar{width:34px;height:34px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,var(--accent2),var(--accent3));display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:white;}
+
+/* MAIN */
+.main-wrap{flex:1;min-width:0;display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+.topbar{height:var(--topbar-h);flex-shrink:0;background:var(--g2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;gap:16px;position:relative;z-index:10;}
+.icon-btn{width:38px;height:38px;border-radius:10px;background:rgba(34,197,94,.05);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;color:var(--muted);}
+.icon-btn:hover{border-color:var(--border2);color:var(--accent3);}
+.content{flex:1;overflow-y:auto;padding:28px 32px 40px;display:flex;flex-direction:column;gap:24px;}
+
+/* PAGE HERO */
+.page-hero{position:relative;border-radius:20px;overflow:hidden;background:linear-gradient(120deg,#050D1A 0%,#091624 40%,#0E2E4A 72%,#0E6FA0 100%);padding:28px 32px;box-shadow:0 16px 40px -10px rgba(0,0,0,.55),inset 0 0 0 1px rgba(103,232,249,.07);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.page-hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200'%3E%3Cellipse cx='350' cy='100' rx='200' ry='180' fill='none' stroke='rgba(103,232,249,0.06)' stroke-width='1'/%3E%3Cellipse cx='350' cy='100' rx='130' ry='120' fill='none' stroke='rgba(103,232,249,0.04)' stroke-width='1'/%3E%3C/svg%3E") no-repeat right center / 380px;}
+.hero-glow-sky{position:absolute;top:-40px;right:-40px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(103,232,249,.1) 0%,transparent 70%);pointer-events:none;}
+.hero-eyebrow{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(103,232,249,.5);font-weight:600;margin-bottom:8px;}
+.hero-title{font-family:'Instrument Serif',serif;font-size:clamp(1.6rem,2.5vw,2.4rem);color:white;line-height:1.15;font-weight:400;}
+.hero-title em{color:#67E8F9;font-style:italic;}
+.hero-sub{color:rgba(255,255,255,.42);font-size:.82rem;margin-top:6px;line-height:1.6;max-width:280px;}
+
+/* GALLERY GRID */
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:16px;}
+.gal-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;overflow:hidden;cursor:pointer;
+  transition:all .3s cubic-bezier(.34,1.56,.64,1);
+  position:relative;
+}
+.gal-card:hover{transform:translateY(-4px);border-color:var(--border2);box-shadow:0 16px 38px rgba(0,0,0,.3);}
+.gal-img-wrap{
+  position:relative;height:200px;overflow:hidden;
+  background:var(--card2);
+}
+.gal-img-wrap img{
+  width:100%;height:100%;object-fit:cover;
+  opacity:0;transition:opacity .4s,transform .5s;
+}
+.gal-img-wrap img.loaded{opacity:1;}
+.gal-card:hover .gal-img-wrap img{transform:scale(1.07);}
+.gal-placeholder{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#050D1A,#091624,#0E2E4A);
+  background-size:300% 300%;animation:gradShift 8s ease infinite;
+}
+.gal-overlay{
+  position:absolute;inset:0;
+  background:rgba(0,0,0,0);
+  display:flex;align-items:center;justify-content:center;
+  transition:background .25s;
+}
+.gal-card:hover .gal-overlay{background:rgba(0,0,0,.4);}
+.gal-expand{
+  width:44px;height:44px;border-radius:12px;
+  background:rgba(255,255,255,.92);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:scale(.8);
+  transition:all .25s cubic-bezier(.34,1.56,.64,1);
+}
+.gal-card:hover .gal-expand{opacity:1;transform:scale(1);}
+.gal-body{padding:14px 16px;}
+.gal-title{font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.gal-desc{font-size:.75rem;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:10px;}
+.gal-footer{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border);}
+.gal-user{display:flex;align-items:center;gap:7px;}
+.gal-av{width:24px;height:24px;border-radius:7px;background:linear-gradient(135deg,#0EA5E9,#22C55E);display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;color:white;flex-shrink:0;}
+.gal-date{font-size:.66rem;color:var(--dim);}
+
+/* LIGHTBOX */
+.lightbox{
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(0,0,0,.92);
+  backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;visibility:hidden;
+  transition:opacity .28s,visibility .28s;
+}
+.lightbox.open{opacity:1;visibility:visible;}
+.lightbox-inner{
+  max-width:90vw;max-height:90vh;
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  animation:lbIn .3s ease both;
+}
+.lightbox-inner img{
+  max-width:88vw;max-height:78vh;
+  border-radius:12px;
+  box-shadow:0 30px 60px rgba(0,0,0,.5);
+  object-fit:contain;
+}
+.lightbox-caption{font-size:.88rem;color:rgba(255,255,255,.7);text-align:center;}
+.lightbox-close{
+  position:fixed;top:20px;right:20px;
+  width:40px;height:40px;border-radius:10px;
+  background:rgba(255,255,255,.1);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:white;transition:background .2s;border:none;
+}
+.lightbox-close:hover{background:rgba(255,255,255,.2);}
+
+/* PAGINATION */
+.pagination{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-top:1px solid var(--border);}
+.pag-info{font-size:.75rem;color:var(--dim);}
+.pag-btns{display:flex;gap:6px;}
+.pag-btn{padding:7px 14px;border-radius:8px;font-size:.75rem;font-weight:600;text-decoration:none;transition:all .2s;}
+.pag-btn-prev{background:rgba(34,197,94,.07);border:1px solid var(--border);color:var(--muted);}
+.pag-btn-prev:hover{border-color:var(--border2);color:var(--text);}
+.pag-btn-next{background:var(--accent2);color:white;border:1px solid transparent;}
+.pag-btn-next:hover{background:var(--accent);}
+.pag-btn-disabled{background:rgba(34,197,94,.03);border:1px solid var(--border);color:var(--dim);cursor:not-allowed;}
+
+/* SEC */
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.sec-title{display:flex;align-items:center;gap:10px;}
+.sec-title-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.sec-title-text{font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
+.sec-line{flex:1;height:1px;background:var(--border);margin-left:10px;}
+
+/* EMPTY */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5rem 2rem;text-align:center;background:var(--card);border:1px solid var(--border);border-radius:18px;}
+.empty-icon{width:72px;height:72px;border-radius:20px;background:rgba(103,232,249,.07);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--dim);margin-bottom:1.25rem;}
+
+@media(max-width:768px){.sidebar{display:none;}.gallery-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:480px){.gallery-grid{grid-template-columns:1fr;}}
+</style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 font-sans">
-    <div x-data="{ sidebarOpen: false }" class="flex min-h-screen">
-        
+<body x-data="{ darkMode: true, lbOpen: false, lbSrc: '', lbTitle: '' }" :class="darkMode ? '' : 'light'" @keydown.escape.window="lbOpen=false">
 
-        <!-- Mobile Menu Button -->
-        <div class="lg:hidden fixed top-4 left-4 z-50">
-            <button @click="sidebarOpen = !sidebarOpen" 
-                    class="p-2 rounded-lg bg-white dark:bg-gray-800 shadow-lg text-gray-600 dark:text-gray-300">
-                <i class="fas fa-bars text-xl"></i>
-            </button>
-        </div>
+<!-- ══════ SIDEBAR ══════ -->
+<aside class="sidebar fu fu1">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">
+      <svg width="18" height="18" fill="none" stroke="white" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    </div>
+    <span class="serif" style="font-size:1.25rem;color:var(--text);letter-spacing:-.01em;">Wandr</span>
+  </div>
+  <nav class="sb-nav">
+    <span class="sb-section-label">Main</span>
+    <a href="{{ route('dashboard') }}" class="sb-item">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Dashboard
+    </a>
+    <a href="{{ route('user.destinations.index') }}" class="sb-item">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+      Destinations
+    </a>
+    <a href="{{ route('bookings.user.index') }}" class="sb-item">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      My Bookings
+    </a>
+    <a href="{{ route('user.gallery.index') }}" class="sb-item active">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Gallery
+      <span class="sb-badge">{{ $galleries->total() }}</span>
+    </a>
+    <span class="sb-section-label" style="margin-top:8px;">Account</span>
+    <a href="#" class="sb-item">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+      Profile
+    </a>
+    <a href="#" class="sb-item">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
+      Settings
+    </a>
+  </nav>
+  <div class="sb-footer">
+    <div class="sb-user">
+      <div class="sb-avatar">{{ substr(Auth::user()->name,0,1) }}</div>
+      <div style="flex:1;min-width:0;">
+        <p style="font-size:.78rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ Auth::user()->name }}</p>
+        <p style="font-size:.65rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ Auth::user()->email }}</p>
+      </div>
+    </div>
+  </div>
+</aside>
 
-        <!-- Main Content -->
-        <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Header -->
-            <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
-                <div class="px-6 py-4">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center pl-12 lg:pl-0">
-                            <div>
-                                <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-                                    <i class="fas fa-images mr-3 text-primary-600 dark:text-primary-400"></i>
-                                    Photo Gallery
-                                    <span class="ml-3 text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 font-bold px-3 py-1 rounded-full">BROWSE</span>
-                                </h1>
-                                <p class="text-sm text-gray-600 dark:text-gray-300 mt-1 flex items-center">
-                                    <i class="fas fa-camera text-xs mr-2"></i>
-                                    {{ $galleries->total() }} photos available
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center space-x-4">
-                            <!-- Dark Mode Toggle -->
-                            <button onclick="toggleDarkMode()"
-                                class="p-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors">
-                                <i class="fas fa-moon text-lg dark:hidden"></i>
-                                <i class="fas fa-sun text-lg hidden dark:inline"></i>
-                            </button>
-                            
-                            <!-- Back to Dashboard -->
-                            <a href="{{ route('dashboard') }}"
-                                class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 px-5 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-3 group">
-                                <i class="fas fa-home text-lg"></i>
-                                Dashboard
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </header>
+<!-- ══════ MAIN ══════ -->
+<div class="main-wrap">
 
-            <!-- Main Content Area -->
-            <main class="flex-1 overflow-y-auto scrollbar-thin p-6 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-                <div class="max-w-7xl mx-auto">
-                    
-                    <!-- Gallery Header -->
-                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-8">
-                        <div>
-                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Explore Photos</h2>
-                            <p class="text-gray-600 dark:text-gray-300 mt-2">Browse beautiful travel moments</p>
-                        </div>
-                        <div class="flex items-center space-x-3 mt-4 md:mt-0">
-                            <button class="p-2.5 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                <i class="fas fa-th-large text-lg"></i>
-                            </button>
-                        </div>
-                    </div>
+  <!-- TOPBAR -->
+  <header class="topbar fu fu1">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div style="width:38px;height:38px;border-radius:11px;background:rgba(103,232,249,.08);border:1px solid rgba(103,232,249,.15);display:flex;align-items:center;justify-content:center;">
+        <svg width="18" height="18" fill="none" stroke="#67E8F9" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      </div>
+      <div>
+        <p style="font-size:.9rem;font-weight:700;color:var(--text);">Photo Gallery</p>
+        <p style="font-size:.7rem;color:var(--muted);">{{ $galleries->total() }} photos available</p>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button class="icon-btn" @click="darkMode = !darkMode">
+        <svg x-show="darkMode" width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        <svg x-show="!darkMode" width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+      </button>
+      <a href="{{ route('dashboard') }}" style="display:flex;align-items:center;gap:7px;padding:8px 16px;border-radius:10px;font-size:.78rem;font-weight:600;background:rgba(34,197,94,.1);border:1px solid var(--border2);color:var(--accent3);text-decoration:none;transition:all .2s;" onmouseover="this.style.background='rgba(34,197,94,.18)'" onmouseout="this.style.background='rgba(34,197,94,.1)'">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        Dashboard
+      </a>
+      <form method="POST" action="{{ route('logout') }}" style="display:inline;">
+        @csrf
+        <button type="submit" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;font-size:.78rem;font-weight:600;background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.18);color:#F87171;cursor:pointer;">
+          <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          Sign out
+        </button>
+      </form>
+    </div>
+  </header>
 
-                    <!-- Gallery Grid -->
-                    @if($galleries->count() > 0)
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        @foreach($galleries as $index => $gallery)
-                        <div class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 card-hover border border-gray-100 dark:border-gray-700 animate-fade-in cursor-pointer"
-                             style="animation-delay: {{ $index * 0.05 }}s"
-                             onclick="openLightbox('{{ asset('storage/' . $gallery->image_path) }}', '{{ $gallery->title }}')">
-                            
-                            <!-- Image Container -->
-                            <div class="relative h-64 overflow-hidden bg-gray-100 dark:bg-gray-700">
-                                <div class="image-container">
-                                    @if($gallery->image_path)
-                                        <img 
-                                            src="{{ asset('storage/' . $gallery->image_path) }}"
-                                            alt="{{ $gallery->title }}"
-                                            class="w-full h-64 object-cover transition-all duration-500 hover:scale-110"
-                                            onload="handleImageLoad(this)"
-                                            onerror="handleImageError(this)"
-                                            loading="lazy"
-                                        >
-                                    @endif
-                                    
-                                    <!-- Fallback placeholder -->
-                                    <div class="image-placeholder">
-                                        <div class="w-16 h-16 rounded-full bg-white/50 dark:bg-gray-800/50 flex items-center justify-center mb-3">
-                                            <i class="fas fa-image text-gray-500 dark:text-gray-400 text-2xl"></i>
-                                        </div>
-                                        <p class="text-gray-600 dark:text-gray-300 text-sm text-center font-medium px-4">{{ $gallery->title }}</p>
-                                    </div>
-                                </div>
-                                
-                                <!-- Hover overlay with view icon -->
-                                <div class="absolute inset-0 bg-black/0 hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">
-                                    <div class="opacity-0 hover:opacity-100 transition-opacity duration-300">
-                                        <div class="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center">
-                                            <i class="fas fa-expand text-gray-700 text-xl"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+  <!-- CONTENT -->
+  <div class="content">
 
-                            <!-- Content -->
-                            <div class="p-5">
-                                <h3 class="font-bold text-gray-900 dark:text-white text-lg truncate mb-2">{{ $gallery->title }}</h3>
-                                
-                                @if($gallery->description)
-                                <p class="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2">{{ $gallery->description }}</p>
-                                @endif
-
-                                <div class="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
-                                    <div class="flex items-center">
-                                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-blue-400 flex items-center justify-center text-white font-bold text-sm mr-3">
-                                            {{ substr($gallery->user ? $gallery->user->name : 'U', 0, 1) }}
-                                        </div>
-                                        <div>
-                                            <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $gallery->user ? $gallery->user->name : 'Unknown' }}</p>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ $gallery->created_at->format('M d, Y') }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center space-x-3 text-gray-400">
-                                        <span class="flex items-center text-sm">
-                                            <i class="fas fa-eye mr-1"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
-                    @else
-                    <!-- Empty State -->
-                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-12 text-center shadow-lg border border-gray-100 dark:border-gray-700 animate-bounce-in">
-                        <div class="max-w-md mx-auto">
-                            <div class="w-20 h-20 mx-auto bg-gradient-to-br from-purple-100 to-pink-50 dark:from-purple-900/30 dark:to-pink-800/30 rounded-2xl flex items-center justify-center mb-6">
-                                <i class="fas fa-images text-purple-500 dark:text-purple-400 text-3xl"></i>
-                            </div>
-                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">No Photos Yet</h3>
-                            <p class="text-gray-600 dark:text-gray-300 mb-8">Check back later for amazing travel photos!</p>
-                            <a href="{{ route('dashboard') }}"
-                                class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3.5 px-8 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center gap-3">
-                                <i class="fas fa-home text-lg"></i>
-                                Back to Dashboard
-                            </a>
-                        </div>
-                    </div>
-                    @endif
-
-                    <!-- Pagination -->
-                    @if($galleries->hasPages())
-                    <div class="mt-10 pt-8 border-t border-gray-200 dark:border-gray-700">
-                        <div class="flex items-center justify-between">
-                            <p class="text-sm text-gray-600 dark:text-gray-300">
-                                Showing {{ $galleries->firstItem() }} to {{ $galleries->lastItem() }} of {{ $galleries->total() }} photos
-                            </p>
-                            <div class="flex space-x-2">
-                                @if($galleries->onFirstPage())
-                                <button disabled class="px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-400 text-sm">
-                                    <i class="fas fa-chevron-left mr-2"></i> Previous
-                                </button>
-                                @else
-                                <a href="{{ $galleries->previousPageUrl() }}" class="px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm">
-                                    <i class="fas fa-chevron-left mr-2"></i> Previous
-                                </a>
-                                @endif
-                                
-                                @if($galleries->hasMorePages())
-                                <a href="{{ $galleries->nextPageUrl() }}" class="px-4 py-2.5 bg-gradient-to-r from-primary-600 to-blue-500 text-white rounded-xl text-sm shadow-sm hover:shadow">
-                                    Next <i class="fas fa-chevron-right ml-2"></i>
-                                </a>
-                                @else
-                                <button disabled class="px-4 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-400 rounded-xl text-sm">
-                                    Next <i class="fas fa-chevron-right ml-2"></i>
-                                </button>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                    @endif
-                </div>
-            </main>
-        </div>
+    <!-- Hero -->
+    <div class="page-hero fu fu2">
+      <div class="hero-glow-sky"></div>
+      <div style="position:relative;z-index:1;">
+        <p class="hero-eyebrow">Visual Stories</p>
+        <h1 class="hero-title">Photo <em>Gallery</em></h1>
+        <p class="hero-sub">Browse beautiful travel moments captured around the world.</p>
+      </div>
+      <div style="background:rgba(0,0,0,.2);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:14px 18px;text-align:center;position:relative;z-index:1;">
+        <p style="font-family:'Instrument Serif',serif;font-size:2rem;color:white;line-height:1;">{{ $galleries->total() }}</p>
+        <p style="font-size:.62rem;color:rgba(103,232,249,.6);text-transform:uppercase;letter-spacing:.1em;margin-top:2px;">Total Photos</p>
+      </div>
     </div>
 
-    <!-- Lightbox -->
-    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
-        <div class="absolute top-4 right-4">
-            <button onclick="closeLightbox()" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors">
-                <i class="fas fa-times text-lg"></i>
-            </button>
+    @if($galleries->count() > 0)
+
+    <div class="fu fu3">
+      <div class="sec-head">
+        <div class="sec-title">
+          <div class="sec-title-dot" style="background:var(--sky);"></div>
+          <span class="sec-title-text">Explore Photos</span>
+          <div class="sec-line"></div>
         </div>
-        <div class="text-center">
-            <img id="lightboxImage" src="" alt="">
-            <p id="lightboxCaption" class="text-white mt-4 text-lg font-medium"></p>
+        @if($galleries->hasPages())
+          <span style="font-size:.72rem;color:var(--dim);">Page {{ $galleries->currentPage() }} of {{ $galleries->lastPage() }}</span>
+        @endif
+      </div>
+
+      <div class="gallery-grid">
+        @foreach($galleries as $i => $gallery)
+        <div class="gal-card fu" style="animation-delay:{{ $i * 0.05 + 0.18 }}s;"
+             @click="lbOpen=true; lbSrc='{{ asset('storage/'.$gallery->image_path) }}'; lbTitle='{{ addslashes($gallery->title) }}'">
+          <div class="gal-img-wrap">
+            @if($gallery->image_path)
+              <img src="{{ asset('storage/'.$gallery->image_path) }}"
+                   alt="{{ $gallery->title }}"
+                   onload="this.classList.add('loaded')"
+                   onerror="this.style.display='none'">
+            @endif
+            <div class="gal-placeholder" @if($gallery->image_path) style="display:none;" @endif>
+              <svg width="28" height="28" fill="none" stroke="var(--sky)" opacity=".35" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <div class="gal-overlay">
+              <div class="gal-expand">
+                <svg width="16" height="16" fill="none" stroke="#0D1F14" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="gal-body">
+            <h3 class="gal-title">{{ $gallery->title }}</h3>
+            @if($gallery->description)
+              <p class="gal-desc">{{ $gallery->description }}</p>
+            @endif
+            <div class="gal-footer">
+              <div class="gal-user">
+                <div class="gal-av">{{ substr($gallery->user ? $gallery->user->name : 'U',0,1) }}</div>
+                <span style="font-size:.75rem;color:var(--muted);">{{ $gallery->user ? $gallery->user->name : 'Unknown' }}</span>
+              </div>
+              <span class="gal-date">{{ $gallery->created_at->format('M d, Y') }}</span>
+            </div>
+          </div>
         </div>
+        @endforeach
+      </div>
     </div>
 
-    <script>
-        // Dark mode toggle
-        function toggleDarkMode() {
-            document.documentElement.classList.toggle('dark');
-            localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
-        }
+    @if($galleries->hasPages())
+    <div class="pagination fu fu4">
+      <p class="pag-info">Showing {{ $galleries->firstItem() }}–{{ $galleries->lastItem() }} of {{ $galleries->total() }} photos</p>
+      <div class="pag-btns">
+        @if($galleries->onFirstPage())
+          <span class="pag-btn pag-btn-disabled">← Previous</span>
+        @else
+          <a href="{{ $galleries->previousPageUrl() }}" class="pag-btn pag-btn-prev">← Previous</a>
+        @endif
+        @if($galleries->hasMorePages())
+          <a href="{{ $galleries->nextPageUrl() }}" class="pag-btn pag-btn-next">Next →</a>
+        @else
+          <span class="pag-btn pag-btn-disabled">Next →</span>
+        @endif
+      </div>
+    </div>
+    @endif
 
-        // Initialize dark mode
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.documentElement.classList.add('dark');
-        }
+    @else
+    <div class="empty fu fu3">
+      <div class="empty-icon">
+        <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      </div>
+      <p style="font-weight:700;font-size:.96rem;color:var(--text);">Gallery is empty</p>
+      <p style="font-size:.8rem;color:var(--muted);margin-top:6px;">No photos have been uploaded yet.</p>
+      <a href="{{ route('dashboard') }}" style="margin-top:20px;display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:10px;font-size:.8rem;font-weight:600;background:rgba(34,197,94,.1);border:1px solid var(--border2);color:var(--accent3);text-decoration:none;">
+        Back to Dashboard
+      </a>
+    </div>
+    @endif
 
-        // Image handling functions
-        function handleImageLoad(img) {
-            img.classList.add('loaded');
-            const placeholder = img.nextElementSibling;
-            if (placeholder) {
-                placeholder.style.display = 'none';
-            }
-        }
+    <div style="padding-top:8px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+      <p style="font-size:.7rem;color:var(--dim);">Signed in as <span style="color:var(--accent);font-weight:600;">{{ Auth::user()->email }}</span></p>
+      <p class="serif" style="font-size:.7rem;color:var(--dim);">Wandr &copy; {{ date('Y') }}</p>
+    </div>
 
-        function handleImageError(img) {
-            img.style.display = 'none';
-            const placeholder = img.nextElementSibling;
-            if (placeholder) {
-                placeholder.classList.add('image-error');
-                placeholder.style.display = 'flex';
-            }
-        }
+  </div>
+</div>
 
-        // Lightbox functions
-        function openLightbox(imageSrc, title) {
-            document.getElementById('lightboxImage').src = imageSrc;
-            document.getElementById('lightboxCaption').textContent = title;
-            document.getElementById('lightbox').classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
+<!-- LIGHTBOX -->
+<div class="lightbox" :class="{ 'open': lbOpen }" @click.self="lbOpen=false">
+  <button class="lightbox-close" @click="lbOpen=false">
+    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+  </button>
+  <div class="lightbox-inner" x-show="lbOpen">
+    <img :src="lbSrc" :alt="lbTitle">
+    <p class="lightbox-caption" x-text="lbTitle"></p>
+  </div>
+</div>
 
-        function closeLightbox() {
-            document.getElementById('lightbox').classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-
-        // Close lightbox on ESC
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeLightbox();
-        });
-    </script>
 </body>
 </html>
