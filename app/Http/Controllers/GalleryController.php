@@ -55,6 +55,38 @@ class GalleryController extends Controller
         return redirect()->route('gallery.index')->with('success', 'Image uploaded successfully!');
     }
 
+    public function edit(Gallery $gallery)
+    {
+        return view('gallery.edit', compact('gallery'));
+    }
+
+    public function update(Request $request, Gallery $gallery)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+
+        $data = [
+            'title' => $request->title,
+            'description' => $request->description,
+        ];
+
+        // If new image is uploaded, replace the old one
+        if ($request->hasFile('image')) {
+            // Delete old image
+            Storage::disk('public')->delete($gallery->image_path);
+            
+            // Store new image
+            $data['image_path'] = $request->file('image')->store('gallery', 'public');
+        }
+
+        $gallery->update($data);
+
+        return redirect()->route('gallery.index')->with('success', 'Image updated successfully!');
+    }
+
     public function destroy(Gallery $gallery)
     {
         // Delete the image file

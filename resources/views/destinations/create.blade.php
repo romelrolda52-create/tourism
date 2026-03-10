@@ -102,7 +102,11 @@
 <body class="bg-gray-50 dark:bg-gray-900 font-sans">
     <div x-data="{ sidebarOpen: false }" class="flex min-h-screen">
         
-        @include('layouts.sidebar-admin')
+        @if(auth()->user()->role === 'admin')
+            @include('layouts.sidebar-admin')
+        @else
+            @include('layouts.sidebar-manager')
+        @endif
 
         <!-- Mobile Menu Button -->
         <div class="lg:hidden fixed top-4 left-4 z-50">

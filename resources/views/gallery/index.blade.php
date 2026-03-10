@@ -206,13 +206,7 @@
                                 <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                             </button>
                             
-                            <!-- Upload Button -->
-                            <button onclick="openUploadModal()"
-                                class="bg-gradient-to-r from-primary-600 to-blue-500 hover:from-primary-700 hover:to-blue-600 text-white font-semibold py-3 px-5 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-3 group">
-                                <i class="fas fa-cloud-upload-alt text-lg"></i>
-                                Upload Photo
-                                <i class="fas fa-plus text-sm group-hover:rotate-90 transition-transform"></i>
-                            </button>
+                           
                         </div>
                     </div>
                 </div>
@@ -309,6 +303,14 @@
                             <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Gallery Collection</h2>
                             <p class="text-gray-600 dark:text-gray-300 mt-2">Manage and organize your visual content</p>
                         </div>
+
+                         <!-- Upload Button -->
+                            <button onclick="openUploadModal()"
+                                class="bg-gradient-to-r from-primary-600 to-blue-500 hover:from-primary-700 hover:to-blue-600 text-white font-semibold py-3 px-5 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-3 group">
+                                <i class="fas fa-cloud-upload-alt text-lg"></i>
+                                Upload Photo
+                                <i class="fas fa-plus text-sm group-hover:rotate-90 transition-transform"></i>
+                            </button>
                         <div class="flex items-center space-x-3 mt-4 md:mt-0">
                             <select class="appearance-none bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl py-2.5 pl-4 pr-10 text-gray-700 dark:text-gray-200 text-sm focus:ring-2 focus:ring-primary-500">
                                 <option>Sort by: Newest</option>
@@ -359,8 +361,11 @@
                             <div class="p-5">
                                 <div class="flex items-start justify-between mb-3">
                                     <h3 class="font-bold text-gray-900 dark:text-white text-lg truncate pr-2">{{ $gallery->title }}</h3>
-                                    @if(auth()->id() === $gallery->user_id)
+                                @if(auth()->id() === $gallery->user_id || auth()->user()->role === 'admin')
                                     <div class="flex items-center space-x-2">
+                                        <a href="{{ route('gallery.edit', $gallery) }}" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors p-1" title="Edit">
+                                            <i class="fas fa-edit text-sm"></i>
+                                        </a>
                                         
                                         <form action="{{ route('gallery.destroy', $gallery) }}" method="POST" onsubmit="return confirm('Delete this photo?');">
                                             @csrf
@@ -456,64 +461,86 @@
         </div>
     </div>
 
-    <!-- Upload Modal -->
-    <div id="uploadModal" class="hidden fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden modal-enter">
+    <!-- Upload Modal - Full Screen Overlay -->
+    <div id="uploadModal" class="hidden fixed inset-0 z-[60] overflow-y-auto">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity" onclick="closeUploadModal()"></div>
+
+        <!-- Modal Container - Centered with proper spacing -->
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-xl my-8 overflow-hidden">
                 <!-- Modal Header -->
-                <div class="bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 px-6 py-5">
+                <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-white font-bold text-xl">Upload New Photo</h3>
-                            <p class="text-purple-100 text-sm mt-1">Share your moments</p>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mr-3">
+                                <i class="fas fa-cloud-upload-alt text-white text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-white font-bold text-xl">Upload New Photo</h3>
+                                <p class="text-blue-100 text-sm mt-0.5">Add a new photo to your gallery</p>
+                            </div>
                         </div>
-                        <button onclick="closeUploadModal()" class="text-white hover:text-purple-200 text-2xl">
-                            &times;
+                        <button onclick="closeUploadModal()" class="text-white/80 hover:text-white hover:bg-white/20 rounded-lg p-2 transition-colors">
+                            <i class="fas fa-times text-xl"></i>
                         </button>
                     </div>
                 </div>
 
                 <!-- Modal Form -->
-                <form action="{{ route('gallery.store') }}" method="POST" enctype="multipart/form-data" class="p-6 space-y-6" id="uploadForm">
+                <form action="{{ route('gallery.store') }}" method="POST" enctype="multipart/form-data" class="p-6 space-y-5" id="uploadForm">
                     @csrf
 
+                    <!-- Photo Title -->
                     <div>
-                        <label class="block text-gray-700 dark:text-gray-200 font-semibold text-sm mb-3">
+                        <label class="block text-gray-700 dark:text-gray-200 font-semibold text-sm mb-2">
+                            <i class="fas fa-heading mr-2 text-blue-500"></i>
                             Photo Title <span class="text-red-500">*</span>
                         </label>
-                        <input type="text" name="title" required placeholder="Enter a title"
-                            class="w-full px-4 py-3.5 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:ring-2 focus:ring-primary-500">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fas fa-tag text-gray-400"></i>
+                            </div>
+                            <input type="text" name="title" required placeholder="Enter photo title"
+                                class="w-full pl-11 pr-4 py-3 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                        </div>
                     </div>
 
+                    <!-- Description -->
                     <div>
-                        <label class="block text-gray-700 dark:text-gray-200 font-semibold text-sm mb-3">
+                        <label class="block text-gray-700 dark:text-gray-200 font-semibold text-sm mb-2">
+                            <i class="fas fa-align-left mr-2 text-blue-500"></i>
                             Description <span class="text-gray-400 text-xs">(Optional)</span>
                         </label>
-                        <textarea name="description" rows="3" placeholder="Tell the story..."
-                            class="w-full px-4 py-3.5 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:ring-2 focus:ring-primary-500 resize-none"></textarea>
+                        <textarea name="description" rows="3" placeholder="Tell the story behind this photo..."
+                            class="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"></textarea>
                     </div>
 
+                    <!-- Upload Photo -->
                     <div>
-                        <label class="block text-gray-700 dark:text-gray-200 font-semibold text-sm mb-3">
+                        <label class="block text-gray-700 dark:text-gray-200 font-semibold text-sm mb-2">
+                            <i class="fas fa-image mr-2 text-blue-500"></i>
                             Upload Photo <span class="text-red-500">*</span>
                         </label>
-                        <div class="border-3 border-dashed border-gray-200 dark:border-gray-600 rounded-2xl p-8 text-center hover:border-primary-400 transition-all bg-gray-50 dark:bg-gray-700/50">
-                            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                                <i class="fas fa-cloud-upload-alt text-blue-500 dark:text-blue-400 text-2xl"></i>
-                            </div>
-                            <p class="text-gray-700 dark:text-gray-200 font-medium mb-2">Click to browse</p>
-                            <p class="text-gray-500 dark:text-gray-400 text-sm mb-4">JPG, PNG, WebP up to 10MB</p>
+                        <div class="border-2 border-dashed border-gray-200 dark:border-gray-600 rounded-xl p-6 text-center hover:border-blue-400 dark:hover:border-blue-500 transition-all bg-gray-50 dark:bg-gray-700/30"
+                             onclick="document.getElementById('imageInput').click()">
                             <input type="file" name="image" required accept="image/*"
-                                class="block w-full text-sm text-gray-600 dark:text-gray-300
-                                       file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0
-                                       file:text-sm file:font-semibold file:bg-blue-500 file:text-white
-                                       hover:file:bg-blue-600 cursor-pointer"
+                                class="hidden"
                                 id="imageInput" onchange="previewImage(this)">
                             
-                            <div id="imagePreview" class="hidden mt-4">
-                                <div class="relative w-32 h-32 mx-auto overflow-hidden rounded-xl border-2 border-primary-200">
-                                    <img id="previewImage" class="w-full h-full object-cover">
-                                    <button type="button" onclick="removePreview()" 
-                                            class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600">
+                            <div id="uploadPlaceholder">
+                                <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                                    <i class="fas fa-cloud-upload-alt text-blue-500 dark:text-blue-400 text-2xl"></i>
+                                </div>
+                                <p class="text-gray-700 dark:text-gray-200 font-medium mb-1">Click to upload or drag and drop</p>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm">JPG, PNG, GIF, WebP (max 10MB)</p>
+                            </div>
+                            
+                            <div id="imagePreview" class="hidden">
+                                <div class="relative w-full h-48 overflow-hidden rounded-xl border-2 border-blue-200 dark:border-blue-700">
+                                    <img id="previewImage" class="w-full h-full object-contain bg-gray-100 dark:bg-gray-700">
+                                    <button type="button" onclick="event.stopPropagation(); removePreview()" 
+                                            class="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </div>
@@ -521,13 +548,15 @@
                         </div>
                     </div>
 
-                    <div class="pt-6 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+                    <!-- Action Buttons -->
+                    <div class="pt-4 flex justify-end gap-3">
                         <button type="button" onclick="closeUploadModal()"
-                            class="px-6 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 font-medium rounded-xl">
+                            class="px-5 py-2.5 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 font-medium rounded-xl transition-colors flex items-center gap-2">
+                            <i class="fas fa-times"></i>
                             Cancel
                         </button>
-                        <button type="submit"
-                            class="bg-gradient-to-r from-primary-600 to-blue-500 hover:from-primary-700 hover:to-blue-600 text-white font-semibold px-8 py-3 rounded-xl shadow-md hover:shadow-lg flex items-center gap-3">
+                        <button type="submit" form="uploadForm"
+                            class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-6 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2">
                             <i class="fas fa-cloud-upload-alt"></i>
                             Upload Photo
                         </button>
@@ -577,7 +606,14 @@
             document.getElementById('uploadModal').classList.add('hidden');
             document.body.style.overflow = 'auto';
             document.getElementById('uploadForm').reset();
-            document.getElementById('imagePreview').classList.add('hidden');
+            // Reset preview
+            const preview = document.getElementById('imagePreview');
+            const placeholder = document.getElementById('uploadPlaceholder');
+            if (preview) preview.classList.add('hidden');
+            if (placeholder) placeholder.classList.remove('hidden');
+            // Reset file input
+            const fileInput = document.getElementById('imageInput');
+            if (fileInput) fileInput.value = '';
         }
 
         function previewImage(input) {
@@ -586,14 +622,22 @@
                 reader.onload = function(e) {
                     document.getElementById('previewImage').src = e.target.result;
                     document.getElementById('imagePreview').classList.remove('hidden');
+                    document.getElementById('uploadPlaceholder').classList.add('hidden');
                 }
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
         function removePreview() {
-            document.getElementById('imageInput').value = '';
-            document.getElementById('imagePreview').classList.add('hidden');
+            const fileInput = document.getElementById('imageInput');
+            const preview = document.getElementById('imagePreview');
+            const placeholder = document.getElementById('uploadPlaceholder');
+            const previewImg = document.getElementById('previewImage');
+            
+            if (fileInput) fileInput.value = '';
+            if (preview) preview.classList.add('hidden');
+            if (placeholder) placeholder.classList.remove('hidden');
+            if (previewImg) previewImg.src = '';
         }
 
         // Close modal on ESC
@@ -603,7 +647,9 @@
 
         // Close modal on backdrop click
         document.getElementById('uploadModal')?.addEventListener('click', (e) => {
-            if (e.target.id === 'uploadModal') closeUploadModal();
+            if (e.target.classList.contains('bg-black')) {
+                closeUploadModal();
+            }
         });
     </script>
 </body>

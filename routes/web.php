@@ -45,7 +45,7 @@ Route::middleware(['auth', 'role:admin,manager'])->group(function () {
         ->name('bookings.manage.cancel');
 
     Route::resource('destinations', DestinationController::class)->only(['index', 'store', 'create', 'update', 'destroy', 'edit']);
-    Route::resource('gallery', GalleryController::class)->only(['index', 'store', 'create', 'destroy']);
+    Route::resource('gallery', GalleryController::class)->only(['index', 'store', 'create', 'edit', 'update', 'destroy']);
     Route::resource('feedback', FeedbackController::class)->only(['index', 'store', 'create', 'show', 'update', 'destroy', 'edit']);
 
     // Hotel Management
