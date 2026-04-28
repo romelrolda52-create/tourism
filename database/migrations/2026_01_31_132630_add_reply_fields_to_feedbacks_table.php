@@ -9,9 +9,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('feedbacks', function (Blueprint $table) {
-            $table->text('admin_reply')->nullable()->after('feedback');
-            $table->timestamp('replied_at')->nullable()->after('admin_reply');
-            $table->foreignId('replied_by')->nullable()->constrained('users')->onDelete('set null')->after('replied_at');
+            $table->text('admin_reply')->nullable();
+            $table->timestamp('replied_at')->nullable();
+            $table->foreignId('replied_by')->nullable()->constrained('users')->onDelete('set null');
         });
     }
 
