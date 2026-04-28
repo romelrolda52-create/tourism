@@ -12,7 +12,8 @@ class HomeController extends Controller
     {
         $destinations = Destination::where('is_active', true)->take(6)->get();
         $galleries = Gallery::with('user')->latest()->take(8)->get();
+$welcomeContent = \App\Models\WelcomeContent::getContent();
 
-        return view('welcome', compact('destinations', 'galleries'));
+        return view('welcome', compact('destinations', 'galleries', 'welcomeContent'));
     }
 }

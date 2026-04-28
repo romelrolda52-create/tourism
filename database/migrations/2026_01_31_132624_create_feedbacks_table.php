@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('feedbacks', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
+            $table->string('guest_name')->nullable();
+            $table->string('guest_email')->nullable();
+            $table->text('feedback');
+            $table->tinyInteger('rating')->unsigned()->default(0);
+            $table->foreignId('booking_id')->nullable()->constrained()->onDelete('set null');
             $table->timestamps();
         });
     }

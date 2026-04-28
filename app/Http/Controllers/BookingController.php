@@ -26,6 +26,14 @@ class BookingController extends Controller
     }
 
     /**
+     * Show the form for creating a new booking for a vehicle.
+     */
+    public function createForVehicle(\App\Models\Vehicle $vehicle)
+    {
+        return view('booking.vehicle-create', compact('vehicle'));
+    }
+
+    /**
      * Store a newly created booking in storage.
      */
     public function storeUserBooking(Request $request)
@@ -69,6 +77,49 @@ class BookingController extends Controller
     }
 
     /**
+     * Store vehicle booking.
+     */
+    public function storeVehicleBooking(Request $request, \App\Models\Vehicle $vehicle)
+    {
+        $validated = $request->validate([
+            'vehicle_id' => 'required|exists:transportation_vehicles,id',
+            'guest_name' => 'required|string|max:255',
+            'guest_email' => 'required|email|max:255',
+            'guest_phone' => 'required|string|max:20',
+            'travel_date' => 'required|date|after_or_equal:today',
+            'return_date' => 'nullable|date|after:travel_date',
+            'number_of_guests' => 'required|integer|min:1|max:' . $vehicle->capacity,
+            'special_requests' => 'nullable|string',
+        ]);
+
+        $trips = 1;
+        if ($validated['return_date']) {
+            $travel = \Carbon\Carbon::parse($validated['travel_date']);
+            $return = \Carbon\Carbon::parse($validated['return_date']);
+            $trips = $travel->diffInDays($return) * 2; // round trip per day
+        }
+
+        $totalPrice = $vehicle->price_per_trip * $trips * $validated['number_of_guests'];
+
+        $booking = Booking::create([
+            'user_id' => Auth::id(),
+            'vehicle_id' => $vehicle->id,
+            'guest_name' => $validated['guest_name'],
+            'guest_email' => $validated['guest_email'],
+            'guest_phone' => $validated['guest_phone'],
+            'check_in_date' => $validated['travel_date'],
+            'check_out_date' => $validated['return_date'],
+            'number_of_guests' => $validated['number_of_guests'],
+            'total_price' => $totalPrice,
+            'status' => 'pending',
+            'special_requests' => $validated['special_requests'] ?? null,
+        ]);
+
+        return redirect()->route('bookings.user.index')
+            ->with('success', 'Vehicle booking submitted successfully! Pending for manager approval.');
+    }
+
+    /**
      * Display user's bookings.
      */
     public function userBookings()
@@ -79,6 +130,80 @@ class BookingController extends Controller
             ->get();
         
         return view('booking.user-index', compact('bookings'));
+    }
+
+    /**
+     * Admin bookings index.
+     */
+    public function adminIndex()
+    {
+        $bookings = Booking::with(['user', 'destination'])
+            ->latest()
+            ->get();
+        return view('booking.admin.index', compact('bookings'));
+    }
+
+    /**
+     * Admin edit booking.
+     */
+    public function adminEdit(Booking $booking)
+    {
+        return view('booking.admin.edit', compact('booking'));
+    }
+
+    /**
+     * Admin update booking.
+     */
+    public function adminUpdate(Request $request, Booking $booking)
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:pending,confirmed,cancelled',
+            'notes' => 'nullable|string',
+        ]);
+        $booking->update($validated);
+        return redirect()->route('bookings.admin.index')->with('success', 'Booking updated.');
+    }
+
+    /**
+     * Admin delete booking.
+     */
+    public function adminDestroy(Booking $booking)
+    {
+        $booking->delete();
+        return redirect()->route('bookings.admin.index')->with('success', 'Booking deleted.');
+    }
+
+    /**
+     * Manager bookings index.
+     */
+    public function managerIndex()
+    {
+        $bookings = Booking::with(['user', 'destination'])
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->latest()
+            ->get();
+        return view('booking.manager.index', compact('bookings'));
+    }
+
+    /**
+     * Manager edit booking.
+     */
+    public function managerEdit(Booking $booking)
+    {
+        return view('booking.manager.edit', compact('booking'));
+    }
+
+    /**
+     * Manager update booking.
+     */
+    public function managerUpdate(Request $request, Booking $booking)
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:pending,confirmed',
+            'notes' => 'nullable|string',
+        ]);
+        $booking->update($validated);
+        return redirect()->route('bookings.manager.index')->with('success', 'Booking updated.');
     }
 
     /**

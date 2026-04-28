@@ -12,6 +12,7 @@ class Booking extends Model
         'destination_id',
         'hotel_id',
         'room_id',
+        'vehicle_id',
         'guest_name',
         'guest_email',
         'guest_phone',
@@ -61,6 +62,22 @@ class Booking extends Model
     public function room(): BelongsTo
     {
         return $this->belongsTo(Room::class);
+    }
+
+    /**
+     * Get the vehicle of the booking.
+     */
+    public function vehicle(): BelongsTo
+    {
+        return $this->belongsTo(Vehicle::class);
+    }
+
+    /**
+     * Get the payments for the booking.
+     */
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
     }
 
     /**

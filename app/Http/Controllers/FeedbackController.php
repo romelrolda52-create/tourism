@@ -11,7 +11,35 @@ class FeedbackController extends Controller
      */
     public function index()
     {
-        //
+        $feedbacks = \App\Models\Feedback::with(['booking', 'repliedBy'])->latest()->paginate(10);
+        return view('feedback.index', compact('feedbacks'));
+    }
+
+    /**
+     * Show form to reply to feedback
+     */
+    public function reply(Feedback $feedback)
+    {
+        return view('feedback.reply', compact('feedback'));
+    }
+
+    /**
+     * Store admin reply
+     */
+    public function storeReply(Request $request, Feedback $feedback)
+    {
+        $request->validate([
+            'admin_reply' => 'required|string|max:1000'
+        ]);
+
+        $feedback->update([
+            'admin_reply' => $request->admin_reply,
+            'replied_at' => now(),
+            'replied_by' => auth()->id(),
+        ]);
+
+        return redirect()->route('feedback.index')
+            ->with('success', 'Reply sent successfully!');
     }
 
     /**

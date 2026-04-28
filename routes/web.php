@@ -10,6 +10,8 @@ use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UtilityController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\RestaurantController;
+use App\Http\Controllers\WelcomeContentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +29,11 @@ Route::get('/', [HomeController::class, 'index']);
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('users', UserController::class);
+    
+    // Welcome Content Editor (Admin only)
+    Route::get('/welcome-content/edit', [WelcomeContentController::class, 'edit'])->name('welcome-content.edit');
+    Route::put('/welcome-content', [WelcomeContentController::class, 'update'])->name('welcome-content.update');
+    Route::post('/welcome-content/reset', [WelcomeContentController::class, 'reset'])->name('welcome-content.reset');
 });
 
 /*
@@ -36,20 +43,54 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 */
 
 Route::middleware(['auth', 'role:admin,manager'])->group(function () {
-    // Booking management routes
-    Route::get('/manage-bookings', [BookingController::class, 'manageBookings'])
-        ->name('bookings.manage.index');
-    Route::post('/manage-bookings/{booking}/confirm', [BookingController::class, 'confirmBooking'])
-        ->name('bookings.manage.confirm');
-    Route::post('/manage-bookings/{booking}/cancel', [BookingController::class, 'cancelBooking'])
-        ->name('bookings.manage.cancel');
+    // Admin & Manager Booking routes
+    Route::prefix('bookings')->name('bookings.')->group(function () {
+        // Admin specific
+        Route::middleware('role:admin')->group(function () {
+            Route::get('/admin', [BookingController::class, 'adminIndex'])->name('admin.index');
+            Route::get('/admin/{booking}/edit', [BookingController::class, 'adminEdit'])->name('admin.edit');
+            Route::put('/admin/{booking}', [BookingController::class, 'adminUpdate'])->name('admin.update');
+            Route::delete('/admin/{booking}', [BookingController::class, 'adminDestroy'])->name('admin.destroy');
+        });
+
+        // Manager specific
+        Route::middleware('role:manager')->group(function () {
+            Route::get('/manager', [BookingController::class, 'managerIndex'])->name('manager.index');
+            Route::get('/manager/{booking}/edit', [BookingController::class, 'managerEdit'])->name('manager.edit');
+            Route::put('/manager/{booking}', [BookingController::class, 'managerUpdate'])->name('manager.update');
+        });
+
+        // Shared manage routes
+        Route::get('/manage', [BookingController::class, 'manageBookings'])->name('manage.index');
+        Route::post('/manage/{booking}/confirm', [BookingController::class, 'confirmBooking'])->name('manage.confirm');
+        Route::post('/manage/{booking}/cancel', [BookingController::class, 'cancelBooking'])->name('manage.cancel');
+    });
 
     Route::resource('destinations', DestinationController::class)->only(['index', 'store', 'create', 'update', 'destroy', 'edit']);
     Route::resource('gallery', GalleryController::class)->only(['index', 'store', 'create', 'edit', 'update', 'destroy']);
     Route::resource('feedback', FeedbackController::class)->only(['index', 'store', 'create', 'show', 'update', 'destroy', 'edit']);
+    
+    // Feedback Reply Routes
+    Route::get('feedback/{feedback}/reply', [FeedbackController::class, 'reply'])->name('feedback.reply');
+    Route::post('feedback/{feedback}/reply', [FeedbackController::class, 'storeReply'])->name('feedback.reply.store');
+    
+    // Tour Packages Management
+    Route::resource('tour-packages', \App\Http\Controllers\TourPackageController::class);
+
+    // Transportation Management
+    Route::resource('transportation', \App\Http\Controllers\TransportationController::class);
 
     // Hotel Management
     Route::resource('hotel', HotelController::class);
+
+    // Restaurant Management
+    Route::resource('restaurants', RestaurantController::class);
+
+    // Reports (Admin & Manager)
+    Route::get('/reports', [\App\Http\Controllers\ReportsController::class, 'index'])->name('reports.index');
+
+    // Payment Management (Admin only)
+    Route::resource('payments', \App\Http\Controllers\PaymentController::class);
 
     // Room Management
     Route::get('hotel/{hotel}/rooms/create', [HotelController::class, 'createRoom'])->name('hotel.rooms.create');
@@ -99,23 +140,27 @@ Route::get('/dashboard', [UtilityController::class, 'dashboard'])
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'role:user'])->group(function () {
-    // User destinations - view only (read-only access to active destinations)
-    Route::get('/user-destinations', [DestinationController::class, 'userIndex'])
-        ->name('user.destinations.index');
-    
-    // User gallery - view only (view all gallery images)
-    Route::get('/user-gallery', [GalleryController::class, 'userIndex'])
-        ->name('user.gallery.index');
-    
-    // User bookings
-    Route::get('/bookings/create/{destination}', [BookingController::class, 'createForDestination'])
-        ->name('bookings.create');
-    Route::post('/bookings', [BookingController::class, 'storeUserBooking'])
-        ->name('bookings.store');
-    Route::get('/my-bookings', [BookingController::class, 'userBookings'])
-        ->name('bookings.user.index');
-});
+    Route::middleware(['auth', 'role:user'])->group(function () {
+        // User destinations - view only (read-only access to active destinations)
+        Route::get('/user-destinations', [DestinationController::class, 'userIndex'])
+            ->name('user.destinations.index');
+        
+        // User gallery - view only (view all gallery images)
+        Route::get('/user-gallery', [GalleryController::class, 'userIndex'])
+            ->name('user.gallery.index');
+        
+        // User bookings
+        Route::get('/bookings/create/{destination}', [BookingController::class, 'createForDestination'])
+            ->name('bookings.create');
+        Route::post('/bookings', [BookingController::class, 'storeUserBooking'])
+            ->name('bookings.store');
+        Route::get('/bookings/vehicle/{vehicle}/create', [BookingController::class, 'createForVehicle'])
+            ->name('bookings.vehicle.create');
+        Route::post('/bookings/vehicle/{vehicle}', [BookingController::class, 'storeVehicleBooking'])
+            ->name('bookings.vehicle.store');
+        Route::get('/my-bookings', [BookingController::class, 'userBookings'])
+            ->name('bookings.user.index');
+    });
 
 /*
 |--------------------------------------------------------------------------
